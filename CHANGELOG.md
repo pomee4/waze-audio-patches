@@ -1,3 +1,9 @@
+## [1.0.0-dev.3](https://github.com/pomee4/waze-audio-patches/compare/v1.0.0-dev.2...v1.0.0-dev.3) (2026-11-05)
+
+### 🐛 Bug Fixes
+
+* Match Waze's Play Services availability check in GmsCore support ([3a6e4b7](https://github.com/pomee4/waze-audio-patches/commit/3a6e4b7b2c7bc923f163257c524a3044fff87ba9))
+
 ## [1.0.0-dev.2](https://github.com/pomee4/waze-audio-patches/compare/v1.0.0-dev.1...v1.0.0-dev.2) (2026-11-05)
 
 ### ✨ New Features
