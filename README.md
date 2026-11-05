@@ -4,8 +4,24 @@ Patches for use with Morphe that add a music app of your choice (default: myspot
 Waze audio player, without the app needing the Waze SDK.
 
 <!-- PATCHES_START EXPANDED -->
+> **[v1.0.0-dev.5](https://github.com/pomee4/waze-audio-patches/releases/tag/v1.0.0-dev.5)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;2 patches total
+<details open>
+<summary>📦 Waze&nbsp;&nbsp;•&nbsp;&nbsp;2 patches</summary>
+<br>
 
-The patch list is generated here when `release.yml` creates a release.
+**Package name:** `com.waze`
+
+**🎯 Supported versions:**
+
+| 5.26.5.0 |
+| :---: |
+
+| 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
+|----------|----------------|-----------|
+| [Add custom audio app](#add-custom-audio-app) | Adds a music app of your choice (default: myspoti) to the Waze audio player. Waze controls it through its standard Android media service, without the app needing the Waze SDK. | • Audio app package name<br>• Audio app name |
+| [GmsCore support](#gmscore-support) | Uses GmsCore (app.revanced.android.gms) instead of Google Play Services, so Google sign-in and other Google services work in the re-signed app. GmsCore must be installed. |  |
+
+</details>
 
 <!-- PATCHES_END -->
 
@@ -28,6 +44,17 @@ The **Add custom audio app** patch:
 
 Options: `audioAppPackageName` (default `app.myspoti.stable`) and `audioAppName` (default `myspoti`).
 The app must have a `MediaBrowserService`.
+
+### GmsCore support
+
+A patched Waze is re-signed, so Google Play Services rejects it and Google sign-in fails. The **GmsCore support**
+patch redirects Waze's Play Services calls (services, permissions, content providers, push messaging) to
+[GmsCore](https://github.com/MorpheApp/MicroG-RE) (`app.revanced.android.gms`, the same one used by patched YouTube),
+and adds manifest metadata so GmsCore presents the app to Google as the original Waze (package `com.waze`, original
+signature). Unlike patched YouTube, Waze keeps its package name.
+
+Requirements: GmsCore installed, signed in to your Google account in GmsCore, and battery optimization disabled
+for GmsCore (for push notifications). Location still comes from Android's own location providers.
 
 Developed against Waze **5.26.5.0**.
 

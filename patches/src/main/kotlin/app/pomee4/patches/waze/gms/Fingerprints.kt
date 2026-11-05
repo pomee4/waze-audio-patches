@@ -1,0 +1,56 @@
+package app.pomee4.patches.waze.gms
+
+import app.morphe.patcher.Fingerprint
+import app.morphe.patcher.string
+import com.android.tools.smali.dexlib2.AccessFlags
+
+// Fingerprints of the Play Services client library bundled in the app, adapted from Morphe Patches (GPLv3).
+
+/**
+ * `GooglePlayServicesUtilLight.isGooglePlayServicesAvailable(Context, int)`.
+ *
+ * Unlike YouTube, Waze does not inline the "MetadataValueReader" helper into this method,
+ * so it is matched by the Play Store check instead.
+ */
+internal object GooglePlayUtilityFingerprint : Fingerprint(
+    accessFlags = listOf(AccessFlags.PUBLIC, AccessFlags.STATIC),
+    returnType = "I",
+    parameters = listOf("Landroid/content/Context;", "I"),
+    filters = listOf(
+        string("com.google.android.gms"),
+        string(" requires the Google Play Store, but it is missing."),
+    )
+)
+
+/**
+ * `CredentialProviderFactory.tryCreatePostUProvider()` of androidx.credentials.
+ * On Android 14+ returns the provider that uses the system Credential Manager,
+ * which hands Google sign-in to Google Play Services instead of GmsCore.
+ */
+internal object CredentialsFrameworkProviderFingerprint : Fingerprint(
+    definingClass = "Landroidx/credentials/CredentialProviderFactory;",
+    name = "tryCreatePostUProvider",
+    returnType = "Landroidx/credentials/CredentialProvider;",
+    parameters = listOf(),
+)
+
+/**
+ * `CredentialProviderPlayServicesImpl.isAvailableOnDevice(int minGmsApkVersion)` of androidx.credentials.
+ * Decides whether newer Play Services credential APIs (such as identitycredentials) can be used.
+ */
+internal object CredentialsIsAvailableOnDeviceFingerprint : Fingerprint(
+    definingClass = "Landroidx/credentials/playservices/CredentialProviderPlayServicesImpl;",
+    name = "isAvailableOnDevice",
+    returnType = "Z",
+    parameters = listOf("I"),
+)
+
+/**
+ * Throws if Play Services is unavailable. Not present in Waze 5.26.5.0, where the availability check above covers it.
+ */
+internal object ServiceCheckFingerprint : Fingerprint(
+    accessFlags = listOf(AccessFlags.PUBLIC, AccessFlags.STATIC),
+    returnType = "V",
+    parameters = listOf("L", "I"),
+    strings = listOf("Google Play Services not available"),
+)
