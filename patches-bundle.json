@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-11-05T15:23:52",
-  "description": "## [1.0.0-dev.3](https://github.com/pomee4/waze-audio-patches/compare/v1.0.0-dev.2...v1.0.0-dev.3) (2026-11-05)\n\n### 🐛 Bug Fixes\n\n* Match Waze's Play Services availability check in GmsCore support ([3a6e4b7](https://github.com/pomee4/waze-audio-patches/commit/3a6e4b7b2c7bc923f163257c524a3044fff87ba9))",
-  "download_url": "https://github.com/pomee4/waze-audio-patches/releases/download/v1.0.0-dev.3/patches-1.0.0-dev.3.mpp",
+  "created_at": "2026-11-05T15:31:24",
+  "description": "## [1.0.0-dev.4](https://github.com/pomee4/waze-audio-patches/compare/v1.0.0-dev.3...v1.0.0-dev.4) (2026-11-05)\n\n### 🐛 Bug Fixes\n\n* Use GmsCore-supported sign-in API for Google sign-in ([ab53e70](https://github.com/pomee4/waze-audio-patches/commit/ab53e70b7c6998461b1ec7e8541874cb33b3b614))",
+  "download_url": "https://github.com/pomee4/waze-audio-patches/releases/download/v1.0.0-dev.4/patches-1.0.0-dev.4.mpp",
   "signature_download_url": "",
-  "version": "1.0.0-dev.3"
+  "version": "1.0.0-dev.4"
 }

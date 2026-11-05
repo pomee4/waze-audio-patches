@@ -1,3 +1,9 @@
+## [1.0.0-dev.4](https://github.com/pomee4/waze-audio-patches/compare/v1.0.0-dev.3...v1.0.0-dev.4) (2026-11-05)
+
+### 🐛 Bug Fixes
+
+* Use GmsCore-supported sign-in API for Google sign-in ([ab53e70](https://github.com/pomee4/waze-audio-patches/commit/ab53e70b7c6998461b1ec7e8541874cb33b3b614))
+
 ## [1.0.0-dev.3](https://github.com/pomee4/waze-audio-patches/compare/v1.0.0-dev.2...v1.0.0-dev.3) (2026-11-05)
 
 ### 🐛 Bug Fixes
