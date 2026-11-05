@@ -86,7 +86,7 @@ val gmsCoreSupportPatch = bytecodePatch(
     execute {
         // Report Play Services as available.
         GooglePlayUtilityFingerprint.method.returnEarly(0)
-        ServiceCheckFingerprint.method.returnEarly()
+        ServiceCheckFingerprint.methodOrNull?.returnEarly()
 
         fun replaceStrings(fromString: String, toString: String) {
             string(fromString).matchAllMethodIndicesForEach(requireMatches = false) { index ->
