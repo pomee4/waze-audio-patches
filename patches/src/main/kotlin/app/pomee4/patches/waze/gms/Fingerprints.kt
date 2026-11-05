@@ -23,6 +23,17 @@ internal object GooglePlayUtilityFingerprint : Fingerprint(
 )
 
 /**
+ * `CredentialProviderPlayServicesImpl.isAvailableOnDevice(int minGmsApkVersion)` of androidx.credentials.
+ * Decides whether newer Play Services credential APIs (such as identitycredentials) can be used.
+ */
+internal object CredentialsIsAvailableOnDeviceFingerprint : Fingerprint(
+    definingClass = "Landroidx/credentials/playservices/CredentialProviderPlayServicesImpl;",
+    name = "isAvailableOnDevice",
+    returnType = "Z",
+    parameters = listOf("I"),
+)
+
+/**
  * Throws if Play Services is unavailable. Not present in Waze 5.26.5.0, where the availability check above covers it.
  */
 internal object ServiceCheckFingerprint : Fingerprint(

@@ -1,6 +1,7 @@
 package app.pomee4.patches.waze.gms
 
 import app.morphe.patcher.StringComparisonType
+import app.morphe.patcher.extensions.InstructionExtensions.addInstructionsWithLabels
 import app.morphe.patcher.extensions.InstructionExtensions.getInstruction
 import app.morphe.patcher.extensions.InstructionExtensions.replaceInstruction
 import app.morphe.patcher.patch.bytecodePatch
@@ -8,6 +9,7 @@ import app.morphe.patcher.patch.resourcePatch
 import app.morphe.patcher.string
 import app.morphe.patcher.util.matchAllMethodIndicesForEach
 import app.morphe.patcher.util.returnEarly
+import app.morphe.patcher.util.smali.ExternalLabel
 import app.pomee4.patches.waze.gms.GmsConstants.ACTIONS
 import app.pomee4.patches.waze.gms.GmsConstants.AUTHORITIES
 import app.pomee4.patches.waze.gms.GmsConstants.PERMISSIONS
@@ -31,6 +33,9 @@ private const val WAZE_SIGNATURE = "35b438fe1bc69d975dc8702dc16ab69ebf65f26f"
 /** Vendor id of ReVanced/Morphe GmsCore (package app.revanced.android.gms). */
 private const val GMS_CORE_VENDOR_GROUP_ID = "app.revanced"
 private const val GMS_CORE_PACKAGE_NAME = "$GMS_CORE_VENDOR_GROUP_ID.android.gms"
+
+/** `CredentialProviderPlayServicesImpl.MIN_GMS_APK_VERSION`, the base requirement of androidx.credentials. */
+private const val CREDENTIALS_BASE_MIN_GMS_VERSION = 230815045
 
 private val gmsCoreSupportResourcePatch = resourcePatch {
     execute {
@@ -87,6 +92,23 @@ val gmsCoreSupportPatch = bytecodePatch(
         // Report Play Services as available.
         GooglePlayUtilityFingerprint.method.returnEarly(0)
         ServiceCheckFingerprint.methodOrNull?.returnEarly()
+
+        // Google sign-in through androidx.credentials uses the identitycredentials API of newer Play Services,
+        // which GmsCore does not implement, so the request would end up in Google Play Services.
+        // Report only the base Play Services version as available, so the older BeginSignIn/GetSignInIntent
+        // APIs (implemented by GmsCore) are used instead.
+        CredentialsIsAvailableOnDeviceFingerprint.methodOrNull?.apply {
+            addInstructionsWithLabels(
+                0,
+                """
+                    const v0, $CREDENTIALS_BASE_MIN_GMS_VERSION
+                    if-le p1, v0, :original
+                    const/4 v0, 0x0
+                    return v0
+                """,
+                ExternalLabel("original", getInstruction(0)),
+            )
+        }
 
         fun replaceStrings(fromString: String, toString: String) {
             string(fromString).matchAllMethodIndicesForEach(requireMatches = false) { index ->
