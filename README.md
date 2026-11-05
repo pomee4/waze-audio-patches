@@ -44,6 +44,17 @@ The **Add custom audio app** patch:
 Options: `audioAppPackageName` (default `app.myspoti.stable`) and `audioAppName` (default `myspoti`).
 The app must have a `MediaBrowserService`.
 
+### GmsCore support
+
+A patched Waze is re-signed, so Google Play Services rejects it and Google sign-in fails. The **GmsCore support**
+patch redirects Waze's Play Services calls (services, permissions, content providers, push messaging) to
+[GmsCore](https://github.com/MorpheApp/MicroG-RE) (`app.revanced.android.gms`, the same one used by patched YouTube),
+and adds manifest metadata so GmsCore presents the app to Google as the original Waze (package `com.waze`, original
+signature). Unlike patched YouTube, Waze keeps its package name.
+
+Requirements: GmsCore installed, signed in to your Google account in GmsCore, and battery optimization disabled
+for GmsCore (for push notifications). Location still comes from Android's own location providers.
+
 Developed against Waze **5.26.5.0**.
 
 ## Building
