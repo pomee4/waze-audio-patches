@@ -1,3 +1,9 @@
+## [1.0.0-dev.5](https://github.com/pomee4/waze-audio-patches/compare/v1.0.0-dev.4...v1.0.0-dev.5) (2026-11-05)
+
+### 🐛 Bug Fixes
+
+* Route Google sign-in to GmsCore instead of the system Credential Manager ([ef04534](https://github.com/pomee4/waze-audio-patches/commit/ef045340f363df0959ad91105d70be382a6b3815))
+
 ## [1.0.0-dev.4](https://github.com/pomee4/waze-audio-patches/compare/v1.0.0-dev.3...v1.0.0-dev.4) (2026-11-05)
 
 ### 🐛 Bug Fixes
