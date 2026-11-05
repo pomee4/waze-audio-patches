@@ -23,6 +23,18 @@ internal object GooglePlayUtilityFingerprint : Fingerprint(
 )
 
 /**
+ * `CredentialProviderFactory.tryCreatePostUProvider()` of androidx.credentials.
+ * On Android 14+ returns the provider that uses the system Credential Manager,
+ * which hands Google sign-in to Google Play Services instead of GmsCore.
+ */
+internal object CredentialsFrameworkProviderFingerprint : Fingerprint(
+    definingClass = "Landroidx/credentials/CredentialProviderFactory;",
+    name = "tryCreatePostUProvider",
+    returnType = "Landroidx/credentials/CredentialProvider;",
+    parameters = listOf(),
+)
+
+/**
  * `CredentialProviderPlayServicesImpl.isAvailableOnDevice(int minGmsApkVersion)` of androidx.credentials.
  * Decides whether newer Play Services credential APIs (such as identitycredentials) can be used.
  */

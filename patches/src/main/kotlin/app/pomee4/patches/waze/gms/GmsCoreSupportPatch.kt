@@ -1,6 +1,7 @@
 package app.pomee4.patches.waze.gms
 
 import app.morphe.patcher.StringComparisonType
+import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructionsWithLabels
 import app.morphe.patcher.extensions.InstructionExtensions.getInstruction
 import app.morphe.patcher.extensions.InstructionExtensions.replaceInstruction
@@ -92,6 +93,17 @@ val gmsCoreSupportPatch = bytecodePatch(
         // Report Play Services as available.
         GooglePlayUtilityFingerprint.method.returnEarly(0)
         ServiceCheckFingerprint.methodOrNull?.returnEarly()
+
+        // On Android 14+ androidx.credentials goes through the system Credential Manager, which asks
+        // Google Play Services. Without the system provider it falls back to the Play Services library,
+        // whose calls are redirected to GmsCore above.
+        CredentialsFrameworkProviderFingerprint.methodOrNull?.addInstructions(
+            0,
+            """
+                const/4 v0, 0x0
+                return-object v0
+            """,
+        )
 
         // Google sign-in through androidx.credentials uses the identitycredentials API of newer Play Services,
         // which GmsCore does not implement, so the request would end up in Google Play Services.
