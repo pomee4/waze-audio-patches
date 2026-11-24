@@ -49,7 +49,8 @@ internal object UpdateAppListFingerprint : Fingerprint(
         ),
         // The instruction the patch is inserted before.
         opcode(Opcode.MONITOR_EXIT, MatchAfterImmediately()),
-        string("updateAppList: at least one of the sdkConfigs is not initialized"),
+        // No string filter: the "not initialized" log message moved from after the loop
+        // to before it in 5.28.0.0, and the class and method name already identify the method.
     )
 )
 

@@ -12,6 +12,8 @@ object Constants {
         apkFileType = ApkFileType.APKM,
         appIconColor = 0x33CCFF,
         targets = listOf(
+            AppTarget(version = "5.28.0.0"),
+            AppTarget(version = "5.27.5.0"),
             // Version the patch was developed against.
             AppTarget(version = "5.26.5.0"),
             // The Waze audio SDK code has been stable for a long time, so newer versions likely work.
