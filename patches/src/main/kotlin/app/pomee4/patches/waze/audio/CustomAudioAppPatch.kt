@@ -28,40 +28,59 @@ private const val THEME_COLOR = 0xFF1DB954.toInt()
 
 private val PACKAGE_NAME_REGEX = Regex("^[a-zA-Z]\\w*(\\.[a-zA-Z]\\w*)+$")
 
+private fun String.splitList() = split(',').map { it.trim() }.filter { it.isNotEmpty() }
+
 internal val audioAppPackageOption = stringOption(
     key = "audioAppPackageName",
     default = "app.myspoti.stable",
-    title = "Audio app package name",
-    description = "Package name of the music app to add to the Waze audio player. " +
-        "The app must have a MediaBrowserService, as used by Android Auto.",
+    title = "Audio app package names",
+    description = "Package name of the music app to add to the Waze audio player, or several package names " +
+        "separated by commas. Each app must have a MediaBrowserService, as used by Android Auto.",
     required = true,
-) { it != null && it.matches(PACKAGE_NAME_REGEX) }
+) { value -> value != null && value.splitList().let { list -> list.isNotEmpty() && list.all { it.matches(PACKAGE_NAME_REGEX) } } }
 
 internal val audioAppNameOption = stringOption(
     key = "audioAppName",
     default = "myspoti",
-    title = "Audio app name",
-    description = "Name shown for the app in the Waze audio player.",
+    title = "Audio app names",
+    description = "Name shown for each app in the Waze audio player, separated by commas, " +
+        "in the same order as the package names.",
     required = true,
-) { !it.isNullOrBlank() }
+) { value -> value != null && value.splitList().isNotEmpty() }
 
 /**
- * Android 11+ package visibility: Waze must be allowed to see the app to find its MediaBrowserService.
+ * The apps to add, as package name to shown name, from the comma separated options.
+ */
+private fun audioApps(): List<Pair<String, String>> {
+    val packageNames = audioAppPackageOption.value!!.splitList()
+    val names = audioAppNameOption.value!!.splitList()
+    if (packageNames.size != names.size) {
+        throw PatchException(
+            "Got ${packageNames.size} audio app package names but ${names.size} names. " +
+                "Give one name per package name, in the same order."
+        )
+    }
+    if (packageNames.toSet().size != packageNames.size) throw PatchException("Audio app package names repeat")
+    return packageNames.zip(names)
+}
+
+/**
+ * Android 11+ package visibility: Waze must be allowed to see the apps to find their MediaBrowserService.
  */
 private val audioAppVisibilityPatch = resourcePatch {
     execute {
-        val packageName = audioAppPackageOption.value!!
-
         document("AndroidManifest.xml").use { document ->
             val manifest = document.documentElement
             val queries = document.getElementsByTagName("queries").item(0) as Element?
                 ?: document.createElement("queries").also { manifest.appendChild(it) }
 
-            queries.appendChild(
-                document.createElement("package").apply {
-                    setAttribute("android:name", packageName)
-                }
-            )
+            audioApps().forEach { (packageName, _) ->
+                queries.appendChild(
+                    document.createElement("package").apply {
+                        setAttribute("android:name", packageName)
+                    }
+                )
+            }
         }
     }
 }
@@ -76,8 +95,8 @@ private fun String.packageOf() = substringBeforeLast('/')
 @Suppress("unused")
 val customAudioAppPatch = bytecodePatch(
     name = "Add custom audio app",
-    description = "Adds a music app of your choice (default: myspoti) to the Waze audio player. " +
-        "Waze controls it through its standard Android media service, without the app needing the Waze SDK.",
+    description = "Adds music apps of your choice (default: myspoti) to the Waze audio player. " +
+        "Waze controls them through their standard Android media service, without the apps needing the Waze SDK.",
     default = true,
 ) {
     compatibleWith(COMPATIBILITY_WAZE)
@@ -88,10 +107,19 @@ val customAudioAppPatch = bytecodePatch(
     audioAppNameOption()
 
     execute {
-        val packageName = audioAppPackageOption.value!!
-        val appName = audioAppNameOption.value!!
+        val apps = audioApps()
 
-        // region Add the app to the audio partner list Waze downloads from its server.
+        // Jumps to :custom when the package name in the register is one of the apps, else continues.
+        fun matchAnyApp(packageNameRegister: Int, scratchRegister: Int) = apps.joinToString("\n") { (packageName, _) ->
+            """
+                const-string v$scratchRegister, "$packageName"
+                invoke-virtual { v$scratchRegister, v$packageNameRegister }, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+                move-result v$scratchRegister
+                if-nez v$scratchRegister, :custom
+            """
+        }
+
+        // region Add the apps to the audio partner list Waze downloads from its server.
 
         UpdateAppListFingerprint.let {
             val method = it.method
@@ -114,23 +142,26 @@ val customAudioAppPatch = bytecodePatch(
 
             method.addInstructions(
                 monitorExitMatch.index,
-                """
-                    sget-object v$mapRegister, ${appConfigsField.definingClass}->${appConfigsField.name}:${appConfigsField.type}
-                    new-instance v$ctorStart, $configType
-                    const-string v${ctorStart + 1}, "$packageName"
-                    const-string v${ctorStart + 2}, "$appName"
-                    const v${ctorStart + 3}, $SCOPE_AUDIO
-                    const/4 v${ctorStart + 4}, 0x0
-                    const/4 v${ctorStart + 5}, 0x0
-                    invoke-direct/range { v$ctorStart .. v${ctorStart + 5} }, ${partnerConfigConstructor.toSmali()}
-                    invoke-interface { v$mapRegister, v${ctorStart + 1}, v$ctorStart }, Ljava/util/Map;->put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
-                """
+                "sget-object v$mapRegister, ${appConfigsField.definingClass}->${appConfigsField.name}:${appConfigsField.type}\n" +
+                    apps.joinToString("\n") { (packageName, appName) ->
+                        val escapedName = appName.replace("\\", "\\\\").replace("\"", "\\\"")
+                        """
+                            new-instance v$ctorStart, $configType
+                            const-string v${ctorStart + 1}, "$packageName"
+                            const-string v${ctorStart + 2}, "$escapedName"
+                            const v${ctorStart + 3}, $SCOPE_AUDIO
+                            const/4 v${ctorStart + 4}, 0x0
+                            const/4 v${ctorStart + 5}, 0x0
+                            invoke-direct/range { v$ctorStart .. v${ctorStart + 5} }, ${partnerConfigConstructor.toSmali()}
+                            invoke-interface { v$mapRegister, v${ctorStart + 1}, v$ctorStart }, Ljava/util/Map;->put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+                        """
+                    }
             )
         }
 
         // endregion
 
-        // region Treat the app as installed, even though it has no ACTION_INIT broadcast receiver.
+        // region Treat the apps as installed, even though they have no ACTION_INIT broadcast receiver.
 
         IsAudioPartnerInstalledFingerprint.method.apply {
             val registerCount = implementation!!.registerCount
@@ -154,20 +185,20 @@ val customAudioAppPatch = bytecodePatch(
 
             addInstructionsWithLabels(
                 0,
-                """
-                    const-string v$freeRegister, "$packageName"
-                    invoke-virtual { v$freeRegister, v$packageNameRegister }, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
-                    move-result v$freeRegister
-                    if-eqz v$freeRegister, :original
-                    return v$freeRegister
-                """,
+                matchAnyApp(packageNameRegister, freeRegister) +
+                    """
+                        goto :original
+                        :custom
+                        const/4 v$freeRegister, 0x1
+                        return v$freeRegister
+                    """,
                 ExternalLabel("original", getInstruction(0)),
             )
         }
 
         // endregion
 
-        // region On connect, register the app directly as if it had called back through the Waze SDK.
+        // region On connect, register the apps directly as if they had called back through the Waze SDK.
 
         val registerMethod = RegisterAudioPartnerFingerprint.originalMethod
         val sdkManagerClass = RegisterAudioPartnerFingerprint.originalClassDef
@@ -200,11 +231,10 @@ val customAudioAppPatch = bytecodePatch(
 
             addInstructionsWithLabels(
                 0,
+                matchAnyApp(packageNameParam, manager) +
                 """
-                    const-string v$manager, "$packageName"
-                    invoke-virtual { v$manager, v$packageNameParam }, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
-                    move-result v$manager
-                    if-eqz v$manager, :original
+                    goto :original
+                    :custom
 
                     move-object v$manager, v$packageNameParam
                     move-object v$resources, v$tokenParam
