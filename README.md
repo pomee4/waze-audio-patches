@@ -4,7 +4,7 @@ Patches for use with Morphe that add a music app of your choice (default: myspot
 Waze audio player, without the app needing the Waze SDK.
 
 <!-- PATCHES_START EXPANDED -->
-> **[v1.0.0-dev.6](https://github.com/pomee4/waze-audio-patches/releases/tag/v1.0.0-dev.6)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;2 patches total
+> **[v1.0.0-dev.7](https://github.com/pomee4/waze-audio-patches/releases/tag/v1.0.0-dev.7)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;2 patches total
 <details open>
 <summary>📦 Waze&nbsp;&nbsp;•&nbsp;&nbsp;2 patches</summary>
 <br>
@@ -13,8 +13,8 @@ Waze audio player, without the app needing the Waze SDK.
 
 **🎯 Supported versions:**
 
-| 5.26.5.0 |
-| :---: |
+| 5.28.0.0 | 5.27.5.0 | 5.26.5.0 |
+| :---: | :---: | :---: |
 
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|

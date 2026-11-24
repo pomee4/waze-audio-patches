@@ -1,6 +1,6 @@
 {
   "NOTE": "Do NOT manually edit this file. This file is automatically updated when semantic release (release.yml) runs. Manually editing this file can break your releases and break third party tools that use this file.",
-  "version": "1.0.0-dev.6",
+  "version": "1.0.0-dev.7",
   "patches": [
     {
       "name": "Add custom audio app",
@@ -17,6 +17,20 @@
           "signatures": null,
           "formFactor": "MOBILE",
           "targets": [
+            {
+              "version": "5.28.0.0",
+              "versionCodes": null,
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
+            {
+              "version": "5.27.5.0",
+              "versionCodes": null,
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
             {
               "version": "5.26.5.0",
               "versionCodes": null,
@@ -70,6 +84,20 @@
           "signatures": null,
           "formFactor": "MOBILE",
           "targets": [
+            {
+              "version": "5.28.0.0",
+              "versionCodes": null,
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
+            {
+              "version": "5.27.5.0",
+              "versionCodes": null,
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
             {
               "version": "5.26.5.0",
               "versionCodes": null,

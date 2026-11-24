@@ -1,3 +1,9 @@
+## [1.0.0-dev.7](https://github.com/pomee4/waze-audio-patches/compare/v1.0.0-dev.6...v1.0.0-dev.7) (2026-11-24)
+
+### 🐛 Bug Fixes
+
+* Support Waze 5.28.0.0 ([9b8ea76](https://github.com/pomee4/waze-audio-patches/commit/9b8ea766415282b4b35a2fbffa90eaa31dd125cf))
+
 ## [1.0.0-dev.6](https://github.com/pomee4/waze-audio-patches/compare/v1.0.0-dev.5...v1.0.0-dev.6) (2026-11-24)
 
 ### ✨ New Features
