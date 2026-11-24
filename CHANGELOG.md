@@ -1,3 +1,9 @@
+## [1.0.0-dev.6](https://github.com/pomee4/waze-audio-patches/compare/v1.0.0-dev.5...v1.0.0-dev.6) (2026-11-24)
+
+### ✨ New Features
+
+* Add several audio apps to the Waze audio player ([d1ae737](https://github.com/pomee4/waze-audio-patches/commit/d1ae73721be1919cad4a85fb4d51512d53536af2))
+
 ## [1.0.0-dev.5](https://github.com/pomee4/waze-audio-patches/compare/v1.0.0-dev.4...v1.0.0-dev.5) (2026-11-05)
 
 ### 🐛 Bug Fixes
